@@ -6,7 +6,7 @@ If you have a rooted phone, this will allow you to patch the android system and 
 Notably, I made this to inject a fake-signature patch into the system so I can spoof android app signatures.
 
 ## How to use
-Reboot into recovery and run `python3 patch.py`
+Make sure you have adb and java available, connect your device via usb and run `python3 patch.py` (Note: I have only tested this under Linux)
 
 Note: You will need to redo this everytime you flash a new /system partition (e.g. flashing an updated cyanogenmod zip or new ROM)
 
