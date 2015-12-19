@@ -53,19 +53,31 @@ f.close()
 # add fillinsig method
 i = 0
 contents = []
-found = 0
+already_patched = False
+in_function = False
+right_line = False
+start_of_line = None
+done_patching = False
+
 while i < len(old_contents):
-    if ".line 614" in old_contents[i]:
-        found = 1
-        contents.append(".line 615\n")
+    if "fillinsig" in old_contents[i]:
+        already_patched = True
+    if ".method public static generatePackageInfo(Landroid/content/pm/PackageParser$Package;[IIJJLandroid/util/ArraySet;Landroid/content/pm/PackageUserState;I)Landroid/content/pm/PackageInfo;" in old_contents[i]:
+        in_function = True
+    if ".line" in old_contents[i]:
+        start_of_line = i + 1
+    if "arraycopy" in old_contents[i]:
+        right_line = True
+    if not already_patched and in_function and right_line and not done_patching:
+        contents = contents[:start_of_line]
         contents.append("move-object/from16 v0, p0\n")
         contents.append("invoke-static {v11, v0}, Landroid/content/pm/PackageParser;->fillinsig(Landroid/content/pm/PackageInfo;Landroid/content/pm/PackageParser$Package;)V\n")
-        i = i + 22
+        done_patching = True
     else:
         contents.append(old_contents[i])
     i = i + 1
 
-if found == 1:
+if not already_patched:
     contents.extend(fillinsig)
 else:
     print(" *** This framework.jar appears to already have been patched... Exiting.")
