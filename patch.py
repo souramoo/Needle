@@ -58,6 +58,7 @@ in_function = False
 right_line = False
 start_of_line = None
 done_patching = False
+stored_register = "v11"
 
 while i < len(old_contents):
     if "fillinsig" in old_contents[i]:
@@ -68,10 +69,12 @@ while i < len(old_contents):
         start_of_line = i + 1
     if "arraycopy" in old_contents[i]:
         right_line = True
+    if "Landroid/content/pm/PackageInfo;-><init>()V" in old_contents[i] and in_function:
+        stored_register = old_contents[i].split("{")[1].split("}")[0]
     if not already_patched and in_function and right_line and not done_patching:
         contents = contents[:start_of_line]
         contents.append("move-object/from16 v0, p0\n")
-        contents.append("invoke-static {v11, v0}, Landroid/content/pm/PackageParser;->fillinsig(Landroid/content/pm/PackageInfo;Landroid/content/pm/PackageParser$Package;)V\n")
+        contents.append("invoke-static {%s, v0}, Landroid/content/pm/PackageParser;->fillinsig(Landroid/content/pm/PackageInfo;Landroid/content/pm/PackageParser$Package;)V\n" % stored_register)
         done_patching = True
     else:
         contents.append(old_contents[i])
