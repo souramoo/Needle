@@ -8,6 +8,8 @@ Notably, I made this to inject a fake-signature patch into the system so I can s
 ## How to use
 Make sure you have adb and java available, connect your device via usb and run `python3 patch.py` (Note: I have only tested this under Linux)
 
+You will then need to reboot for Android to detect that you've installed a new framework and so for Dalvik/ART to re-optimise all the apps on the phone. Without this, you may receive an `INSTALL_FAILED_DEXOPT` error when installing new apps.
+
 Note: You will need to redo this everytime you flash a new /system partition (e.g. flashing an updated cyanogenmod zip or new ROM)
 
 ## How to fake signatures
