@@ -26,10 +26,12 @@ print(" *** Device detected! proceeding...")
 curdir = os.getcwd()
 dirpath = tempfile.mkdtemp()
 os.chdir(dirpath)
+print(" *** Working dir: %s" % dirpath)
 
 print(" *** Rooting adbd...")
 subprocess.call(["adb", "-s", chosen_one, "root"])
 subprocess.call(["adb", "-s", chosen_one, "wait-for-device"])
+subprocess.call(["adb", "-s", chosen_one, "remount", "/system"])
 
 print(" *** Pulling framework from device...")
 subprocess.check_output(["adb", "-s", chosen_one, "pull", "/system/framework/framework.jar", "."])
@@ -59,17 +61,24 @@ right_line = False
 start_of_line = None
 done_patching = False
 stored_register = "v11"
+partially_patched = False
 
 while i < len(old_contents):
-    if "fillinsig" in old_contents[i]:
+    if ";->fillinsig" in old_contents[i]:
         already_patched = True
+    if ".method public static fillinsig" in old_contents[i]:
+        partially_patched = True
+    if ".method public static generatePackageInfo(Landroid/content/pm/PackageParser$Package;[IIJJLjava/util/Set;Landroid/content/pm/PackageUserState;I)Landroid/content/pm/PackageInfo;" in old_contents[i]:
+        in_function = True
     if ".method public static generatePackageInfo(Landroid/content/pm/PackageParser$Package;[IIJJLandroid/util/ArraySet;Landroid/content/pm/PackageUserState;I)Landroid/content/pm/PackageInfo;" in old_contents[i]:
         in_function = True
-    if ".line" in old_contents[i]:
+    if ".end method" in old_contents[i]:
+        in_function = False
+    if in_function and ".line" in old_contents[i]:
         start_of_line = i + 1
-    if "arraycopy" in old_contents[i]:
+    if in_function and "arraycopy" in old_contents[i]:
         right_line = True
-    if "Landroid/content/pm/PackageInfo;-><init>()V" in old_contents[i] and in_function:
+    if in_function and "Landroid/content/pm/PackageInfo;-><init>()V" in old_contents[i]:
         stored_register = old_contents[i].split("{")[1].split("}")[0]
     if not already_patched and in_function and right_line and not done_patching:
         contents = contents[:start_of_line]
@@ -80,9 +89,11 @@ while i < len(old_contents):
         contents.append(old_contents[i])
     i = i + 1
 
-if not already_patched:
+if not already_patched and not partially_patched:
     contents.extend(fillinsig)
-else:
+elif partially_patched and not already_patched:
+    print(" *** Previous failed patch attempt, not including the fillinsig method again...")
+elif already_patched:
     print(" *** This framework.jar appears to already have been patched... Exiting.")
     sys.exit(0)
 
@@ -109,5 +120,4 @@ print(" *** All done! :)")
 
 # clean up
 os.chdir(curdir)
-print(dirpath)
 #shutil.rmtree(dirpath)
