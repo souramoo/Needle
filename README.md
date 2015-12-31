@@ -1,5 +1,10 @@
 # Framework Patcher for Android
 
+## You are on the cm13-fix-bug branch
+This is for cm13 which appears to have some upstream bug unrelated to the patcher that means microG play-services does not work.
+
+Run `patch.py` as normal, and then run `patch_next.py` to apply the hacky fix to get play-services to work.
+
 ## What this does
 If you have a rooted phone, this will allow you to patch the android system and inject features without needing to recompile the OS or install xposed.
 
