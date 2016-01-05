@@ -13,15 +13,15 @@ You will then need to reboot for Android to detect that you've installed a new f
 Note: You will need to redo this everytime you flash a new /system partition (e.g. flashing an updated cyanogenmod zip or new ROM)
 
 ## How to fake signatures
-If you have run `patch.py`, you should now have a system patched to accept spoofed app signatures. (Useful for ).
+If you have run `patch.py`, you should now have a system patched to accept spoofed app signatures. (Useful for [microG](https://github.com/microg/android_packages_apps_GmsCore)). This bit below is not necessary if you just want that.
 
-If you want to modify an app and keep its signature, copy the output of:
+If you want to modify an arbitrary app and keep its signature by making use of this patch, copy the output of:
 
 ```
 java /path/to/framework/patcher/ApkSig <apk name>
 ```
 
-into a meta-data underneath <application> in the AndroidManifest.xml - disassemble the app as follows:
+into a meta-data underneath <application> in the app's AndroidManifest.xml. Disassemble the app as follows:
 
 ```
 apktool d <apk name>
