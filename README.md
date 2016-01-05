@@ -1,5 +1,7 @@
 # Framework Patcher for Android
 
+# Note: No longer necessary after the bug was actually fixed in microG
+
 ## You are on the cm13-fix-bug branch
 This is for cm13 which appears to have some upstream bug unrelated to the patcher that means microG play-services does not work.
 
