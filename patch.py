@@ -1,7 +1,23 @@
 #!/usr/bin/env python3
 import os, subprocess, tempfile, time, shutil, sys
 
-# ensure binaries are present
+# check if dependencies are there
+deperrors = []
+DEVNULL = open(os.devnull, 'w')
+
+def exists(program):
+    try:
+        process = subprocess.call([program, "-h"], stdout=DEVNULL, stderr=DEVNULL)
+        return 0
+    except:
+        deperrors.append(program)
+        return 1
+
+if exists("zip") + exists("adb") + exists("java") > 0:
+    print(" *** ERROR: Dependencies not satisfied.")
+    print("\tPlease make sure you install:\n\t%s" % (deperrors))
+
+# check if device is connected
 devices = subprocess.check_output(["adb", "devices"]).decode("utf-8")
 
 if devices.count('\n') <= 2:
