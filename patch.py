@@ -16,6 +16,7 @@ def exists(program):
 if exists("zip") + exists("adb") + exists("java") > 0:
     print(" *** ERROR: Dependencies not satisfied.")
     print("\tPlease make sure you install:\n\t%s" % (deperrors))
+    sys.exit(2)
 
 # check if device is connected
 devices = subprocess.check_output(["adb", "devices"]).decode("utf-8")
