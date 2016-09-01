@@ -46,16 +46,16 @@ os.chdir(dirpath)
 print(" *** Working dir: %s" % dirpath)
 
 print(" *** Rooting adbd...")
-subprocess.call(["adb", "-s", chosen_one, "root"])
-subprocess.call(["adb", "-s", chosen_one, "wait-for-device"])
-subprocess.call(["adb", "-s", chosen_one, "remount", "/system"])
+subprocess.check_call(["adb", "-s", chosen_one, "root"])
+subprocess.check_call(["adb", "-s", chosen_one, "wait-for-device"])
+subprocess.check_call(["adb", "-s", chosen_one, "remount", "/system"])
 
 print(" *** Pulling framework from device...")
 subprocess.check_output(["adb", "-s", chosen_one, "pull", "/system/framework/framework.jar", "."])
 
 # disassemble it
 print(" *** Disassembling framework...")
-subprocess.call(["java", "-jar", curdir+"/apktool.jar", "d", "framework.jar"])
+subprocess.check_call(["java", "-jar", curdir+"/apktool.jar", "d", "framework.jar"])
 
 # do the injection
 print(" *** Done. Now this won't hurt a bit...")
@@ -125,12 +125,12 @@ f.close()
 
 # reassemble it
 print(" *** Injection successful. Reassembling smali...")
-subprocess.call(["java", "-jar", curdir+"/apktool.jar", "b", "framework.jar.out"])
+subprocess.check_call(["java", "-jar", curdir+"/apktool.jar", "b", "framework.jar.out"])
 
 # put classes.smali into framework.jar
 print(" *** Putting things back like nothing ever happened...")
 os.chdir("framework.jar.out/build/apk")
-subprocess.call(["zip", "-r", "../../../framework.jar", "classes.dex"])
+subprocess.check_call(["zip", "-r", "../../../framework.jar", "classes.dex"])
 os.chdir("../../..")
 
 # push to device
