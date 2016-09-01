@@ -90,6 +90,8 @@ while i < len(old_contents):
         in_function = True
     if ".method public static generatePackageInfo(Landroid/content/pm/PackageParser$Package;[IIJJLjava/util/HashSet;Landroid/content/pm/PackageUserState;I)Landroid/content/pm/PackageInfo;" in old_contents[i]:
         in_function = True
+    if ".method public static generatePackageInfo(Landroid/content/pm/PackageParser$Package;[IIJJLjava/util/HashSet;ZII)Landroid/content/pm/PackageInfo;" in old_contents[i]:
+        in_function = True
     if ".end method" in old_contents[i]:
         in_function = False
     if in_function and ".line" in old_contents[i]:
