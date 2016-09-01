@@ -6,7 +6,7 @@ from distutils.spawn import find_executable
 deperrors = []
 
 def exists(program):
-    if find_executable(program):
+    if find_executable(program) is not None:
         return 0
     deperrors.append(program)
     return 1
