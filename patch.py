@@ -39,8 +39,9 @@ print(" *** Selected device " + chosen_one)
 
 print(" *** Device detected! proceeding...")
 
+PREVIOUS_DIR = os.getcwd()
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 # pull framework somewhere temporary
-curdir = os.getcwd()
 dirpath = tempfile.mkdtemp()
 os.chdir(dirpath)
 print(" *** Working dir: %s" % dirpath)
@@ -55,7 +56,7 @@ subprocess.check_output(["adb", "-s", chosen_one, "pull", "/system/framework/fra
 
 # disassemble it
 print(" *** Disassembling framework...")
-subprocess.call(["java", "-jar", curdir+"/apktool.jar", "d", "framework.jar"])
+subprocess.call(["java", "-jar", SCRIPT_DIR+"/apktool.jar", "d", "framework.jar"])
 
 # do the injection
 print(" *** Done. Now this won't hurt a bit...")
@@ -65,7 +66,7 @@ f = open(to_patch, "r")
 old_contents = f.readlines()
 f.close()
 
-f = open(curdir+"/fillinsig.smali", "r")
+f = open(SCRIPT_DIR+"/fillinsig.smali", "r")
 fillinsig = f.readlines()
 f.close()
 
@@ -125,7 +126,7 @@ f.close()
 
 # reassemble it
 print(" *** Injection successful. Reassembling smali...")
-subprocess.call(["java", "-jar", curdir+"/apktool.jar", "b", "framework.jar.out"])
+subprocess.call(["java", "-jar", SCRIPT_DIR+"/apktool.jar", "b", "framework.jar.out"])
 
 # put classes.smali into framework.jar
 print(" *** Putting things back like nothing ever happened...")
@@ -139,6 +140,7 @@ subprocess.check_output(["adb", "-s", chosen_one, "push", "framework.jar", "/sys
 
 print(" *** All done! :)")
 
+# return to the previous working directory
+os.chdir(PREVIOUS_DIR)
 # clean up
-os.chdir(curdir)
 #shutil.rmtree(dirpath)
