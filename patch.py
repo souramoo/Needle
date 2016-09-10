@@ -31,7 +31,7 @@ devices = [a.split("\t")[0] for a in devices]
 
 if len(devices) > 1:
     print("Enter id of device to target:")
-    id = input("\n\t".join([str(i)+" - "+a for i,a in zip(range(1, len(devices)+1), devices)]) + "\n\n> ")
+    id = input("\t"+("\n\t").join([str(i)+" - "+a for i,a in zip(range(1, len(devices)+1), devices)]) + "\n\n> ")
     chosen_one = devices[int(id)-1]
 else:
     chosen_one = devices[0]
