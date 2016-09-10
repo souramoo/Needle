@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 import os, subprocess, tempfile, time, shutil, sys
+from distutils.spawn import find_executable
 
 # check if dependencies are there
 deperrors = []
-DEVNULL = open(os.devnull, 'w')
 
 def exists(program):
-    try:
-        process = subprocess.call([program, "-h"], stdout=DEVNULL, stderr=DEVNULL)
+    if find_executable(program) is not None:
         return 0
-    except:
-        deperrors.append(program)
-        return 1
+    deperrors.append(program)
+    return 1
 
 if exists("zip") + exists("adb") + exists("java") > 0:
     print(" *** ERROR: Dependencies not satisfied.")
