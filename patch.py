@@ -11,6 +11,14 @@ def exists(program):
     deperrors.append(program)
     return 1
 
+def search_smali(smali_to_search, base_dir):
+    dir_list = tuple(sorted(os.listdir(base_dir)))
+    for folder in dir_list:
+        folder_path = base_dir+folder+"/"+smali_to_search
+        if folder.startswith("smali") and os.path.exists(folder_path):
+            return folder_path
+    return None
+
 if exists("zip") + exists("adb") + exists("java") > 0:
     print(" *** ERROR: Dependencies not satisfied.")
     print("\tPlease make sure you install:\n\t%s" % (deperrors))
@@ -61,7 +69,10 @@ subprocess.check_call(["java", "-jar", SCRIPT_DIR+"/apktool.jar", "d", "framewor
 
 # do the injection
 print(" *** Done. Now this won't hurt a bit...")
-to_patch = "framework.jar.out/smali/android/content/pm/PackageParser.smali"
+to_patch = search_smali("android/content/pm/PackageParser.smali", "framework.jar.out/")
+if to_patch is None:
+    print(" *** ERROR: The file to patch cannot be found, probably the ROM is odexed.")
+    sys.exit(1)
 
 f = open(to_patch, "r")
 old_contents = f.readlines()
