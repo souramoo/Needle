@@ -12,10 +12,11 @@ Notably, I made this to inject a fake-signature patch into the system so I can s
 4. In the phone settings, find the setting for 'Android debugging' and enable it.
 5. Find the setting for 'Root Access' and make sure ADB has root access.
 6. Now, on the computer, run `python3 patch.py`
+7. Reboot phone
 
 (Note: I have only tested this under Linux)
 
-You will then need to reboot for Android to detect that you've installed a new framework and so for Dalvik/ART to re-optimise all the apps on the phone. Without this, you may receive an `INSTALL_FAILED_DEXOPT` error when installing new apps.
+You will need to reboot for Android to detect that you've installed a new framework and so for Dalvik/ART to re-optimise all the apps on the phone. Without this, you may receive an `INSTALL_FAILED_DEXOPT` error when installing new apps. You can do this in android's recovery too (provided /system is mounted). 
 
 Note: You will need to redo this everytime you flash a new /system partition (e.g. flashing an updated cyanogenmod zip or new ROM)
 
