@@ -64,7 +64,7 @@ subprocess.check_call(["adb", "-s", chosen_one, "remount", "/system"])
 
 print(" *** Pulling framework from device...")
 subprocess.check_output(["adb", "-s", chosen_one, "pull", "/system/framework/framework.jar", "."])
-subprocess.check_call([ ("cp" if POSIX else "copy"), "framework.jar", "framework.jar.backup"]) # back it up in case things ever go wrong
+shutil.copy2("framework.jar", "framework.jar.backup") # back it up in case things ever go wrong
 
 # disassemble it
 print(" *** Disassembling framework...")
