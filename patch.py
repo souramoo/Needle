@@ -2,6 +2,8 @@
 import os, subprocess, tempfile, time, shutil, sys
 from distutils.spawn import find_executable
 
+POSIX = False if os.sep is "\\" else True
+
 # check if dependencies are there
 deperrors = []
 
@@ -62,6 +64,7 @@ subprocess.check_call(["adb", "-s", chosen_one, "remount", "/system"])
 
 print(" *** Pulling framework from device...")
 subprocess.check_output(["adb", "-s", chosen_one, "pull", "/system/framework/framework.jar", "."])
+subprocess.check_call([ ("cp" if POSIX else "copy"), "framework.jar", "framework.jar.backup"]) # back it up in case things ever go wrong
 
 # disassemble it
 print(" *** Disassembling framework...")
@@ -151,6 +154,8 @@ print(" *** Pushing changes to device...")
 subprocess.check_output(["adb", "-s", chosen_one, "push", "framework.jar", "/system/framework/framework.jar"])
 
 print(" *** All done! :)")
+fjar = os.path.join(dirpath, "framework.jar.backup")
+print(" *** Your old framework.jar is present at %s, please run\n     \tadb push \"%s\" /system/framework/framework.jar\n     from recovery if your phone bootloops to recover." % (fjar, fjar))
 
 # return to the previous working directory
 os.chdir(PREVIOUS_DIR)
