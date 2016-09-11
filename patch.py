@@ -68,7 +68,7 @@ shutil.copy2("framework.jar", "framework.jar.backup") # back it up in case thing
 
 # disassemble it
 print(" *** Disassembling framework...")
-subprocess.check_call(["java", "-jar", SCRIPT_DIR+"/apktool.jar", "d", "framework.jar"])
+subprocess.check_call(["java", "-jar", os.path.join(SCRIPT_DIR, "tools", "apktool.jar"), "d", "framework.jar"])
 
 # do the injection
 print(" *** Done. Now this won't hurt a bit...")
@@ -81,7 +81,7 @@ f = open(to_patch, "r")
 old_contents = f.readlines()
 f.close()
 
-f = open(SCRIPT_DIR+"/fillinsig.smali", "r")
+f = open(os.path.join(SCRIPT_DIR, "smali", "fillinsig.smali"), "r")
 fillinsig = f.readlines()
 f.close()
 
@@ -141,11 +141,11 @@ f.close()
 
 # reassemble it
 print(" *** Injection successful. Reassembling smali...")
-subprocess.check_call(["java", "-jar", SCRIPT_DIR+"/apktool.jar", "b", "framework.jar.out"])
+subprocess.check_call(["java", "-jar", os.path.join(SCRIPT_DIR, "tools", "apktool.jar"), "b", "framework.jar.out"])
 
 # put classes.smali into framework.jar
 print(" *** Putting things back like nothing ever happened...")
-os.chdir("framework.jar.out/build/apk")
+os.chdir(os.path.join("framework.jar.out", "build", "apk"))
 subprocess.check_call(["zip", "-r", "../../../framework.jar", "classes.dex"])
 os.chdir("../../..")
 
