@@ -6,7 +6,14 @@ If you have a rooted phone, this will allow you to patch the android system and 
 Notably, I made this to inject a fake-signature patch into the system so I can spoof android app signatures.
 
 ## How to use
-Make sure you have Python, Java and adb available, connect your device via usb. In the phone settings, find the setting for 'Android debugging' and enable it, and find the setting for 'Root Access' and make sure ADB has root access. Now, on the computer, run `python3 patch.py` (Note: I have only tested this under Linux)
+1. Make sure you have Python, Java and adb available
+2. Connect your device via usb.
+3. Make sure Developer Settings is enabled. This is hidden by default since sometime in Android 4.x, you can show it by going to `About Phone` and tapping on the build number five times in succession.
+4. In the phone settings, find the setting for 'Android debugging' and enable it.
+5. Find the setting for 'Root Access' and make sure ADB has root access.
+6. Now, on the computer, run `python3 patch.py`
+
+(Note: I have only tested this under Linux)
 
 You will then need to reboot for Android to detect that you've installed a new framework and so for Dalvik/ART to re-optimise all the apps on the phone. Without this, you may receive an `INSTALL_FAILED_DEXOPT` error when installing new apps.
 
