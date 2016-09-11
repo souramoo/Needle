@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-import os, subprocess, tempfile, time, shutil, sys
+import os, subprocess, tempfile, time, shutil, sys, glob
 from distutils.spawn import find_executable
 
 POSIX = False if os.sep is "\\" else True
+DEBUG_PROCESS = False
 
 # check if dependencies are there
 deperrors = []
@@ -12,14 +13,6 @@ def exists(program):
         return 0
     deperrors.append(program)
     return 1
-
-def search_smali(smali_to_search, base_dir):
-    dir_list = tuple(sorted(os.listdir(base_dir)))
-    for folder in dir_list:
-        folder_path = base_dir+folder+"/"+smali_to_search
-        if folder.startswith("smali") and os.path.exists(folder_path):
-            return folder_path
-    return None
 
 if exists("zip") + exists("adb") + exists("java") > 0:
     print(" *** ERROR: Dependencies not satisfied.")
@@ -35,6 +28,9 @@ devices = subprocess.check_output(["adb", "devices"]).decode("utf-8")
 if devices.count('\n') <= 2:
     print(" *** Please connect your device first.")
     sys.exit(0)
+
+if DEBUG_PROCESS:
+    print(" *** NOTE: Running in debug mode, WILL NOT ACTUALLY PATCH AND PUSH TO DEVICE")
 
 devices = devices.split('\n')[1:-2]
 devices = [a.split("\t")[0] for a in devices]
@@ -68,12 +64,12 @@ shutil.copy2("framework.jar", "framework.jar.backup") # back it up in case thing
 
 # disassemble it
 print(" *** Disassembling framework...")
-subprocess.check_call(["java", "-jar", os.path.join(SCRIPT_DIR, "tools", "apktool.jar"), "d", "framework.jar"])
+subprocess.check_call(["java", "-jar", os.path.join(SCRIPT_DIR, "tools", "baksmali.jar"), "framework.jar", "-o", "classes"])
 
 # do the injection
 print(" *** Done. Now this won't hurt a bit...")
-to_patch = search_smali("android/content/pm/PackageParser.smali", "framework.jar.out/")
-if to_patch is None:
+to_patch = os.path.join("classes", "android", "content", "pm", "PackageParser.smali")
+if not os.path.exists(to_patch):
     print(" *** ERROR: The file to patch cannot be found, probably the ROM is odexed.")
     sys.exit(1)
 
@@ -126,32 +122,32 @@ while i < len(old_contents):
         contents.append(old_contents[i])
     i = i + 1
 
-if not already_patched and not partially_patched:
-    contents.extend(fillinsig)
-elif partially_patched and not already_patched:
-    print(" *** Previous failed patch attempt, not including the fillinsig method again...")
-elif already_patched:
-    print(" *** This framework.jar appears to already have been patched... Exiting.")
-    sys.exit(0)
-
-f = open(to_patch, "w")
-contents = "".join(contents)
-f.write(contents)
-f.close()
+if not DEBUG_PROCESS:
+    if not already_patched and not partially_patched:
+        contents.extend(fillinsig)
+    elif partially_patched and not already_patched:
+        print(" *** Previous failed patch attempt, not including the fillinsig method again...")
+    elif already_patched:
+        print(" *** This framework.jar appears to already have been patched... Exiting.")
+        sys.exit(0)
+    f = open(to_patch, "w")
+    contents = "".join(contents)
+    f.write(contents)
+    f.close()
 
 # reassemble it
 print(" *** Injection successful. Reassembling smali...")
-subprocess.check_call(["java", "-jar", os.path.join(SCRIPT_DIR, "tools", "apktool.jar"), "b", "framework.jar.out"])
+subprocess.check_call(["java", "-jar", os.path.join(SCRIPT_DIR, "tools", "smali.jar"), "classes", "-o", "classes.dex"])
 
 # put classes.smali into framework.jar
 print(" *** Putting things back like nothing ever happened...")
-os.chdir(os.path.join("framework.jar.out", "build", "apk"))
-subprocess.check_call(["zip", "-r", "../../../framework.jar", "classes.dex"])
-os.chdir("../../..")
+for f in glob.glob("classes*.dex"):
+    subprocess.check_call(["zip", "-r", "framework.jar", f])
 
 # push to device
 print(" *** Pushing changes to device...")
-subprocess.check_output(["adb", "-s", chosen_one, "push", "framework.jar", "/system/framework/framework.jar"])
+if not DEBUG_PROCESS:
+    subprocess.check_output(["adb", "-s", chosen_one, "push", "framework.jar", "/system/framework/framework.jar"])
 
 print(" *** All done! :)")
 fjar = os.path.join(dirpath, "framework.jar.backup")
