@@ -64,7 +64,7 @@ shutil.copy2("framework.jar", "framework.jar.backup") # back it up in case thing
 
 # disassemble it
 print(" *** Disassembling framework...")
-subprocess.check_call(["java", "-jar", os.path.join(SCRIPT_DIR, "tools", "baksmali.jar"), "framework.jar", "-o", "classes"])
+subprocess.check_call(["java", "-jar", os.path.join(SCRIPT_DIR, "tools", "baksmali.jar"), "framework.jar", "-o", "classes", "-ls"])
 
 # do the injection
 print(" *** Done. Now this won't hurt a bit...")
