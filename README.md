@@ -1,52 +1,46 @@
-# Framework Patcher for Android
+# Tingle
+[![Build Status](https://travis-ci.org/ale5000-git/tingle.svg?branch=master)](https://travis-ci.org/ale5000-git/tingle)
 
 ## What this does
-If you have a rooted phone, this will allow you to patch the android system and inject features without needing to recompile the OS or install xposed.
+This will allow you to patch the Android system and inject features without needing to recompile the OS or install Xposed.
 
-Notably, I made this to inject a fake-signature patch into the system so I can spoof android app signatures.
+Notably, it is made to inject support for signature spoofing into the system so it can spoof Android app signatures (useful for [microG](https://microg.org/)).
+
+## Compatibility
+Windows, Linux, macOS (OS X) and Android.  
+It doesn't require root on the OS where you run it but it require root on the device you want to patch.
+
+## Dependencies
+Python, 7-Zip, Java and ADB.
+
+### Dependencies setup on Linux
+* `sudo add-apt-repository universe`
+* `sudo apt-get update`
+* `sudo apt-get install python3 p7zip-full default-jre android-tools-adb`
+
+### Dependencies setup on macOS (using [Homebrew](https://brew.sh/))
+* `brew update`
+* `brew install python3`
+* `brew install p7zip`
+* `brew cask install java`
+* `brew cask install android-platform-tools`
 
 ## How to use
-1. Make sure you have Python, Java and adb available
-2. Connect your device via usb.
-3. Make sure Developer Settings is enabled. This is hidden by default since sometime in Android 4.x, you can show it by going to `About Phone` and tapping on the build number five times in succession.
-4. In the phone settings, find the setting for 'Android debugging' and enable it.
-5. Find the setting for 'Root Access' and make sure ADB has root access.
-6. Now, on the computer, run `python3 patch.py`
-7. Reboot phone
+1. Make sure `Developer options` is enabled. This is hidden by default since sometime in Android 4.x, you can show it by going to `About phone` and tapping on the `Build number` seven times in succession.
+2. In the developer settings, find the setting for `Android debugging` and enable it.
+3. Find the setting for `Root access` and make sure ADB has root access.
+4. Connect your device via USB.
+5. Now, on the computer, run `python main.py` (or `python3 main.py`).
+6. Select the option 1 to allow the patcher to do everything automatically.
+7. Reboot the device.
 
-(Note: I have only tested this under Linux)
+You can run this patcher also when the device is in Android's recovery.
 
-You will need to reboot for Android to detect that you've installed a new framework and so for Dalvik/ART to re-optimise all the apps on the phone. Without this, you may receive an `INSTALL_FAILED_DEXOPT` error when installing new apps. You can do this in android's recovery too (provided /system is mounted). 
+You will need to reboot for Android to detect that you've installed a new framework and so for Dalvik/ART to re-optimise all the apps on the phone. Without this, you may receive an `INSTALL_FAILED_DEXOPT` error when installing new apps.
 
-Note: You will need to redo this everytime you flash a new /system partition (e.g. flashing an updated cyanogenmod zip or new ROM)
+Note: You will need to redo this everytime you flash a new `/system` partition (e.g. flashing an updated LineageOS zip or a new ROM).
 
-## How to fake signatures
-If you have run `patch.py`, you should now have a system patched to accept spoofed app signatures. (Useful for [microG](https://github.com/microg/android_packages_apps_GmsCore)). This bit below is not necessary if you just want that.
-
-If you want to modify an arbitrary app and keep its signature by making use of this patch, copy the output of:
-
-```
-java /path/to/framework/patcher/ApkSig <apk name>
-```
-
-into a meta-data underneath <application> in the app's AndroidManifest.xml. Disassemble the app as follows:
-
-```
-apktool d <apk name>
-```
-
-Then in AndroidManifest.xml, find the following: (the dots represent other parameters not important for this)
-
-```
-<application ... >
-```
-
-And insert the meta-data
-
-```
-<application ... >
-    <meta-data
-        android:name="fake-signature"
-        android:value="(value obtained from ApkSig earlier)" />
-```
-
+## Code analysis
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6f54e54bf5bf43c1ad8fd73e26f7ce79)](https://www.codacy.com/app/ale5000-git/tingle?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ale5000-git/tingle&amp;utm_campaign=Badge_Grade)
+[![Codebeat Badge](https://codebeat.co/badges/1e76f80a-957c-44df-9075-9cde78fb2093)](https://codebeat.co/projects/github-com-ale5000-git-tingle-master)
+[![Code Climate Badge](https://codeclimate.com/github/ale5000-git/tingle/badges/gpa.svg)](https://codeclimate.com/github/ale5000-git/tingle)
